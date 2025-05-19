@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin_orders.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'adminindex' %}">CrocsHub</a>
+    </nav>
+
+    <div class="orders-container">
+        <h2>All Orders</h2>
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td data-label="User">{{ order.user.username }}</td>
+                    <td data-label="Email">{{ order.user.email }}</td>
+                    <td data-label="Phone">{{ order.user.userprofile.phone_number|default_if_none:"N/A" }}</td>
+                    <td data-label="Address">{{ order.user.userprofile.address|default_if_none:"N/A" }}</td>
+                    <td data-label="Product">{{ order.product.name }}</td>
+                    <td data-label="Quantity">{{ order.quantity }}</td>
+                    <td data-label="Total Price">{{ order.total_price|floatformat:2 }}</td>
+                    <td data-label="Status">{{ order.status }}</td>
+                    <td data-label="Payment Method">{{ order.payment_method }}</td>
+                    <td data-label="Date">{{ order.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not orders %}
+            <p>No orders found.</p>
+        {% endif %}
+
+        <!-- <a href="{% url 'adminindex' %}" class="back-btn">Back to Admin Index</a> -->
+    </div>
+</body>
+</html>

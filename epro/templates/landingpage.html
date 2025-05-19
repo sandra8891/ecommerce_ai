@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body class="rr">
+    <div class="topnav">
+          <p class="sign-up-text">SIGN UP FOR 15% OFF</p>
+        <div class="account-dropdown">
+            <button class="account-button">
+                <i class="bi bi-person"></i> MY ACCOUNT
+            </button>
+            <div class="account-menu">
+                {% if user.is_authenticated %}
+                    <a href="#">WISHLIST</a>
+                    <a href="#">ORDER STATUS</a>
+                    <a href="#">RETURNS</a>
+                    <a href="{% url 'logoutuser' %}">LOGOUT</a>
+                    {% else %}
+                    <a href="{% url 'loginuser' %}">SIGN IN / REGISTER</a>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+    <div class="nav">
+        <div class="logo">
+            <img  src="{% static 'image/logo.jpeg' %}" alt="crocs">
+        </div>
+</body>
+</html>

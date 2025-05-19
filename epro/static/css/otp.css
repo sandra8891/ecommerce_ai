@@ -1,0 +1,63 @@
+/* Style for the body */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4; /* Light grey background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Style for the form */
+form {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 2px solid black; /* Black border for the form */
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow around the form */
+    text-align: center;
+}
+
+/* Style for the input field */
+input[type="number"] {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid black; /* Black border for the input field */
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+/* Focus effect for the input field */
+input[type="number"]:focus {
+    border-color: #007BFF;
+}
+
+/* Style for the submit button */
+input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for the submit button */
+input[type="submit"]:hover {
+    background-color: #333333;
+}
+
+/* Style for the placeholder text */
+input::placeholder {
+    color: #777;
+    font-style: italic;
+}

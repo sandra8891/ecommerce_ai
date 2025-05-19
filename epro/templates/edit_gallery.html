@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/galleryupload.css' %}">
+    <title>Edit Product</title>
+</head>
+<body>
+    <a href="{% url 'adminindex' %}">CrocsHub</a>
+    <h2>Edit Product</h2>
+    <form method="POST"-enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Name:</label><input type="text" name="todo" value="{{ data.name }}" required><br>
+        <label>Model:</label><input type="text" name="model" value="{{ data.model }}" required><br>
+        <label>Price:</label><input type="number" step="0.01" name="date" value="{{ data.price }}" required><br>
+        <label>Quantity:</label><input type="number" name="quantity" value="{{ data.quantity }}" required><br>
+        <label>Category:</label>
+        <select name="category" required>
+            <option value="women" {% if data.category == 'women' %}selected{% endif %}>Women</option>
+            <option value="men" {% if data.category == 'men' %}selected{% endif %}>Men</option>
+            <option value="unisex" {% if data.category == 'unisex' %}selected{% endif %}>Unisex</option>
+        </select><br>
+        <label>Description:</label><textarea name="description">{{ data.description }}</textarea><br>
+        <label>Image 1:</label><input type="file" name="feedimage1"><br>
+        <label>Image 2:</label><input type="file" name="feedimage2"><br>
+        <label>Image 3:</label><input type="file" name="feedimage3"><br>
+        <label>Image 4:</label><input type="file" name="feedimage4"><br>
+        <label>Image 5:</label><input type="file" name="feedimage5"><br>
+        <button type="submit">Update</button>
+    </form>
+    <!-- <a href="{% url 'adminindex' %}">Back to Admin Index</a> -->
+</body>
+</html>

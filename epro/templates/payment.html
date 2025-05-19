@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment</title>
+</head>
+<body>
+    <form method="POST">
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+            var options = {
+                key: "{{ razorpay_key }}",
+                amount: {{ amount }},
+                currency: "{{ currency }}",
+                name: "{{ name }}",
+                description: "{{ description }}",
+                image: "https://example.com/your_logo",
+                order_id: "{{ razorpay_order_id }}",
+                callback_url: "{{ callback_url }}",
+                redirect: true,
+                prefill: {
+                    name: "{{ prefill.name }}",
+                    email: "{{ prefill.email }}",
+                    contact: "{{ prefill.contact }}"
+                },
+                notes: {
+                    address: "{{ order.address }}"
+                },
+                theme: {
+                    color: "#3399cc"
+                },
+                handler: function (response) {
+                    console.log('Payment successful:', response);
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response) {
+                alert('Payment failed: ' + response.error.description);
+                window.location.href = "{% url 'my_orders' %}";
+            });
+            rzp1.open();
+        </script>
+        <input type="hidden" custom="Hidden Element" name="hidden">
+    </form>
+</body>
+</html>

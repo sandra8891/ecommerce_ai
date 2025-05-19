@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Users</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin_users.css' %}">
+</head>
+<body>
+    <!-- <div class="topnav">
+        <h2><span class="highlight">Crocs</span>Hub</h2>
+    </div> -->
+    <div class="nav">
+        <div class="logo">
+            <a href="{% url 'adminindex' %}">CrocsHub</a>
+        </div>
+    </div>
+    <h1>Registered Users</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No users found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

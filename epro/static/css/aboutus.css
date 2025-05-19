@@ -1,0 +1,193 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: white;
+}
+
+/* Top Navigation */
+.topnav {
+    background-color: black;
+    padding: 10px 20px; /* Add padding to the sides for spacing */
+    font-size: 1.2rem;
+    color: white;
+    border-bottom: 1px solid #000;
+    display: flex;
+    justify-content: space-between; /* Space between items */
+    align-items: center;
+  }
+  
+  .topnav .sign-up-text {
+    text-align: center;
+    flex-grow: 1; /* This ensures the sign-up text takes up remaining space */
+  }
+  
+  /* Account Dropdown container */
+  .topnav .account-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px; /* Adds space from the right edge */
+  }
+  
+/* Main Navigation Bar */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border: 1px solid black; /* Black border around the navigation */
+    padding: 0px;
+    position: relative;
+}
+
+.belownav {
+    background-color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1.2rem;
+    color: #000;
+    border-top: 1px solid #000;
+}
+
+/* Logo Styling */
+.logo img {
+    width: 190px;
+    height: auto;
+    margin-left: 23px;
+
+}
+
+/* Left-side navigation links */
+.left {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.left a {
+    text-decoration: none; /* Remove default underline from links */
+}
+
+.left a div {
+    color: black; /* Set color to black for the div inside the link */
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 19px;
+}
+
+/* Optional: Hover effect */
+.left a div:hover {
+    color: #333; /* Darker color on hover */
+}
+
+
+
+
+/* Right-side search and social media icons */
+.right {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+
+
+.right i {
+    font-size: 1.9rem;
+    color: #555;
+    cursor: pointer;
+    margin-right: 26px;
+}
+
+.footer{
+    background-color: black;
+    display: flex;
+    height:350px;
+
+}
+.footer h4{
+    margin-bottom: 40px;
+    font-size: 16px;
+    color: white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.footer li{
+    list-style: none;
+    margin: 15px;
+    color: rgb(175, 175, 175);
+}
+.footer div{
+    font-size: 15px;
+    font-weight: 500px;
+    /*margin-left: 200px;*/
+    margin-top: 50px;
+}
+.footlogo{
+    margin-left: 200px;
+    margin-top: 50px;
+    margin-right: 60px;
+}
+.foot2{
+    margin-left: 160px;
+    
+}
+
+/* Dropdown Container */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* The Trigger Button */
+.account-button {
+    background: none;
+    border: groove;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* The Dropdown Menu (initially hidden) */
+  .account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    min-width: 189px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    max-height: 300px; /* Max height */
+    overflow-y: auto; /* Scroll if the content is too long */
+  }
+  
+  /* Show the menu on hover */
+  .account-dropdown:hover .account-menu {
+    display: block;
+  }
+  
+  /* Dropdown Links */
+  .account-menu a {
+    display: block;
+    padding: 8px 15px; /* Reduced padding to decrease gap */
+    color: black;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and color */
+    border-bottom: 1px solid #333; /* Permanent underline */
+  }
+  
+  /* Hover effect for links */
+  .account-menu a:hover {
+    background-color: #f1f1f1;
+    color: #666; /* Change text color to a lighter shade */
+  }

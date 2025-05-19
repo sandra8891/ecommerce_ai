@@ -1,0 +1,109 @@
+/* Global Reset and Basic Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #fff; /* White background for the page */
+    color: #000; /* Black text color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Form Container */
+form {
+    background-color: #fff; /* White background for the form */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow to lift the form */
+    border: 2px solid #000; /* Black border for form */
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Heading Styling */
+h2 {
+    text-align: center;
+    font-size: 32px;
+    color: #000;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+/* Input Fields Styling */
+input[type="text"], input[type="email"], input[type="password"] {
+    padding: 15px;
+    border: 2px solid #000; /* Black border for inputs */
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    background-color: #f9f9f9; /* Light gray background for inputs */
+    color: #333; /* Dark text for readability */
+    transition: all 0.3s ease;
+}
+
+/* Focus State for Inputs */
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    border-color: #000; /* Black border on focus */
+    background-color: #fff; /* White background on focus */
+    outline: none;
+}
+
+/* Placeholder Text Styling */
+input::placeholder {
+    color: #aaa; /* Lighter placeholder text */
+}
+
+/* Submit Button Styling */
+input[type="submit"] {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    background-color: #000; /* Black background for the button */
+    color: #fff; /* White text for the button */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Submit Button */
+input[type="submit"]:hover {
+    background-color: #333; /* Darken on hover */
+}
+
+/* Login Link Styling */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: #000; /* Black text for the link */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    color: #333; /* Darker black on hover */
+    text-decoration: underline; /* Underline the link on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    form {
+        padding: 25px;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], input[type="submit"] {
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/galleryupload.css' %}">
+    <title>Upload Product</title>
+</head>
+<body>
+    <nav>
+    <a href="{% url 'adminindex' %}">CrocsHub</a>
+    </nav>
+    <!-- <h2><span class="highlight">Crocs</span>Hub</h2> -->
+    <h2>Upload a New Product</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Name:</label><input type="text" name="todo" required><br>
+        <label>Model:</label><input type="text" name="model" required><br>
+        <label>Price:</label><input type="number" step="0.01" name="date" required><br>
+        <label>Quantity:</label><input type="number" name="quantity" required><br>
+        <label>Category:</label>
+        <select name="category" required>
+            <option value="women">Women</option>
+            <option value="men">Men</option>
+            <option value="unisex">Unisex</option>
+        </select><br>
+        <label>Description:</label><textarea name="description"></textarea><br>
+        <label>Image 1:</label><input type="file" name="feedimage1"><br>
+        <label>Image 2:</label><input type="file" name="feedimage2"><br>
+        <label>Image 3:</label><input type="file" name="feedimage3"><br>
+        <label>Image 4:</label><input type="file" name="feedimage4"><br>
+        <label>Image 5:</label><input type="file" name="feedimage5"><br>
+        <button type="submit">Upload</button>
+    </form>
+    
+</body>
+</html>

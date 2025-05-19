@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Now - {{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/buy_now.css' %}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Buy Now - {{ product.name }}</h2>
+        {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="{{ quantity }}">
+
+            <div class="mb-3">
+                <label class="form-label">Quantity:</label>
+                <input type="number" class="form-control" value="{{ quantity }}" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <textarea name="address" class="form-control" required>{{ user_profile.address|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Place:</label>
+                <input type="text" name="place" class="form-control" value="{{ user_profile.place|default_if_none:'' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="email" name="email" class="form-control" value="{{ user_profile.user.email|default_if_none:request.user.email }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone Number:</label>
+                <input type="text" name="phone_number" class="form-control" value="{{ user_profile.phone_number|default_if_none:'' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Payment Method:</label>
+                <select name="payment_method" class="form-control" required>
+                    <option value="COD">Cash on Delivery</option>
+                    <option value="ONLINE">Online Payment</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Place Order</button>
+        </form>
+    </div>
+</body>
+</html>

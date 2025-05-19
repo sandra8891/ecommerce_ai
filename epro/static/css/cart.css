@@ -1,0 +1,325 @@
+/* Body and General Styles */
+body.rr {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Top Navigation Bar */
+.topnav {
+    background-color: #000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    border-bottom: 1px solid #000;
+}
+
+.topnav p {
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.account-dropdown {
+    position: relative;
+    margin-right: 20px;
+}
+
+.account-button {
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.account-button i {
+    margin-right: 5px;
+}
+
+.account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    min-width: 178px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.account-dropdown:hover .account-menu {
+    display: block;
+}
+
+.account-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.account-menu a:hover {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+/* Main Navigation Bar */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #000;
+    padding: 14px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo img {
+    width: 180px;
+    height: auto;
+}
+
+.left {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.left div {
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 15px;
+}
+
+.left a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.left a:hover {
+    color: #ff4081;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.right form {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+.right form button {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-left: none;
+    background-color: #f0f0f0;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.right a {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.9rem;
+    position: relative;
+}
+
+.right a span {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4081;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+/* Cart Title */
+.cart-title {
+    text-align: center;
+    font-size: 26px;
+    margin-top: 20px;
+}
+
+/* Cart Layout */
+.gallery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid purple;
+    padding: 20px;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.product-details {
+    flex: 1;
+    padding-right: 30px;
+}
+
+.product-image img {
+    max-width: 120px;
+    border-radius: 8px;
+}
+
+.product-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.product-description {
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.product-price {
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.quantity-actions button {
+    background-color: purple;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.delete-button {
+    background-color: purple;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Cart Summary */
+.cart-summary {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 18px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Checkout Button */
+.checkout-button {
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 15px;
+    display: inline-block;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.checkout-button:hover {
+    background-color: #e63573;
+    transform: scale(1.05);
+}
+
+.checkout-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 64, 129, 0.3);
+}
+
+/* Footer */
+.footer {
+    background-color: black;
+    color: white+white;
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer li {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.footer h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.footer i {
+    margin-right: 8px;
+}
+
+.footlogo {
+    flex: 1;
+}
+
+.foot1, .foot2 {
+    flex: 2;
+}
+
+/* Responsive Footer for smaller screens */
+@media (max-width: 768px) {
+    .footer {
+        padding: 20px;
+        flex-direction: column;
+        align-items: center;
+    }
+    .footer ul {
+        text-align: center;
+    }
+    .footlogo, .foot1, .foot2 {
+        flex: 1;
+        text-align: center;
+    }
+}

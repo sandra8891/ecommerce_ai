@@ -1,0 +1,192 @@
+/* General Layout */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: white;
+}
+
+/* Top Navigation */
+.topnav {
+    background-color: black;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1.2rem;
+    color: white;
+    border-bottom: 1px solid #000;
+}
+
+/* Main Navigation Bar */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border: 1px solid black;
+    padding: 15px;
+    position: relative;
+}
+
+/* Logo Styling */
+.logo img {
+    width: 120px;
+    height: auto;
+}
+
+/* Left-side navigation links */
+.left {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.left div {
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.left a {
+    text-decoration: none;
+}
+
+/* Buttons Styling */
+button {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Styling for 'Upload Product' Button */
+.left a button {
+    background-color: black;
+    color: white;
+}
+
+.left a button:hover {
+    background-color: black;
+}
+
+/* Styling for 'Logout' Button */
+.left a:last-child button {
+    background-color: black;
+    color: white;
+}
+
+.left a:last-child button:hover {
+    background-color: black;
+}
+
+/* Right-side search and social media icons */
+.right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.right input[type="search"] {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 200px;
+}
+
+.right i {
+    font-size: 1.5rem;
+    color: #555;
+    cursor: pointer;
+}
+
+/* Gallery Grid */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+/* Gallery Item */
+.product-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Display */
+.images {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Main large image */
+.images img:first-child {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Thumbnail row container */
+.images .thumbnail-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+/* Thumbnail images */
+.images .thumbnail-row img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.images .thumbnail-row img:hover {
+    transform: scale(1.05);
+}
+
+/* Product Details */
+.details {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Button Group */
+.button-group {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.edit-button,
+.delete-button {
+    background-color: black;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+    background-color: #333;
+}

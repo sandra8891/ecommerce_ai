@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/aboutus.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>About Us</title>
+</head>
+<body class="rr">
+    <div class="topnav">
+      <p class="sign-up-text">SIGN UP FOR 15% OFF</p>
+      <div class="account-dropdown">
+        <button class="account-button">
+            <i class="bi bi-person"></i> MY ACCOUNT
+        </button>
+        <div class="account-menu">
+            {% if user.is_authenticated %}
+                <a href="#">WISHLIST</a>
+                <a href="#">ORDER STATUS</a>
+                <a href="#">RETURNS</a>
+                <a href="{% url 'logoutuser' %}">LOGOUT</a>
+                {% else %}
+                <a href="{% url 'loginuser' %}">SIGN IN / REGISTER</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    </div>
+  
+    <div class="nav">
+        <div class="logo">
+            <!-- <img  src="{% static 'image/crocslogo.svg' %}" alt="crocs"> -->
+             <h2><span class="highlight">Crocs</span>Hub</h2>
+        </div>
+        <div class="left">
+            <a href="{% url 'home' %}"><div>HOME</div></a>
+            <a href="#"><div>WOMEN</div></a>
+            <a href="#"><div>MEN</div></a>
+            <a href="#"><div>BESTSELLERS</div></a>
+            <a href="#"><div>NEW ARRIVALS</div></a>
+            <a href="{% url 'about_us' %}"><div>ABOUT US</div></a>
+        </div>
+        <div class="right">
+            <div><i class="bi bi-search"></i></div>
+            <div><i class="bi bi-heart"></i></div>
+            <div class="cart-icon">
+                <i class="bi bi-cart-fill"></i>
+                <span>{{ cart_item_count }}</span> 
+            </div>
+
+        </div>
+    </div> 
+    <h2>ABOUT US</h2>
+    <p>Crocs are made in a variety of styles and colors. The Classic styles are available in more than 30 colors.[37] A "Fuzz Collection" with woolly liners extends the brand's range to winter wear.[38]
+
+        Crocs also sells other fashion accessories. Jibbitz are decorations that can be clipped to the ventilation holes in the shoes.[39]
+        
+        In 2008, the company entered the golf shoe marketplace by acquiring the golf shoe manufacturer Bite Footwear and introducing a Croc-styled pair of golf shoes, the Ace.[24]
+        
+        After the acquisition of HeyDude for $2.5bn in 2022, the shoe maker expanded into shoes other than their patent clogs, and they even started manufacturing apparel.
+        
+        Partnerships and collaborations
+        Crocs was the title sponsor of the Association of Volleyball Professionals (AVP) Tour from 2006 through the 2009 season.[40][41]
+        
+        
+        A Pair of crocs originated by a collab with crocs and the Fast food restaurant McDonald’s in late 2023
+        Crocs were in the public eye in 2021 with celebrities like Nicki Minaj and Justin Bieber modeling the shoes on social media.[42][43] Crocs were popular on social media like TikTok, as well.[44]
+        
+        Crocs collaborations are announced on a regular basis, with individuals and brands designing their own limited-edition versions. In 2021, they partnered with The Smiley Company to launch a special edition Croc.[45] In 2023, they collaborated with German luxury label MCM for a series of limited releases.[46]</p>
+        <div class="footer">
+            <div class="footlogo">
+                <ul>
+                    <li><img src="image/logo (1).png" alt=""></li>
+                    <li><i class="bi bi-facebook"></i></li>
+                    <li>All rights are reseved by Crocs,cochin,india</li>
+                </ul>
+                </div>
+                <div class="foot1">
+                    <ul>
+                        <li><h4>SOLUTIONS</h4></li>
+                        <li>My account</li>
+                        <li>Track Your Order</li>
+                        <li>Order History</li>
+                        <li>Payment Methods</li>
+                        <li>Privacy Policy</li>
+                    </ul>
+                    </div>
+                    <div class="foot1">
+                        <ul>
+                            <li><h4>ABOUT US</h4></li>
+                            <li>About us </li>
+                            <li>Terms & Conditions</li>
+                            <li>Privacy Policy</li>
+                            <li>Return Policy</li>
+                            <li>Site Map</li>
+                        </ul>
+                    </div>
+                    <div class="foot2">
+                        <ul>
+                            <li><h4>CONTACT US</h4></li>
+                            <li><i class="bi bi-geo-alt"></i>, Ernakulam, Kerala</li>
+                                <li><i class="bi bi-telephone"></i>+91-86065 70657</li>
+                                <li><i class="bi bi-clock"></i>Mon - Sat / 9:00AM - 6:00PM</li>
+                            </ul>
+                    </div>
+          </div>
+</body>
+</html>

@@ -1,0 +1,289 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #e5e7eb; /* Soft Gray background */
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            height: 100vh;
+            padding: 20px;
+            border-right: 1px solid #d1d5db; /* Slightly darker gray border */
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .logo h2 {
+            font-size: 24px;
+            color: #2563eb; /* Primary Blue */
+        }
+
+        .sidebar .logo .highlight {
+            color: #2563eb; /* Primary Blue */
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #1f2937; /* Dark Gray text */
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #dbeafe; /* Light Blue hover */
+            color: #2563eb; /* Primary Blue */
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2563eb; /* Primary Blue */
+        }
+
+        /* Product Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-item {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            min-height: 350px; /* Minimum height to maintain uniformity when content is hidden */
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-item .images {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product-item .main-image {
+            width: 100%;
+            height: 200px; /* Fixed height for larger image */
+            object-fit: contain; /* Ensure image scales properly */
+            border-radius: 5px;
+            margin-bottom: 5px; /* Reduced margin to minimize spacing */
+            cursor: pointer;
+        }
+
+        .product-item .thumbnail-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            display: none; /* Hidden by default, and will remain hidden */
+        }
+
+        .product-item .thumbnail-row.show {
+            display: flex; /* This class is no longer toggled */
+        }
+
+        .product-item .thumbnail-row img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .product-item .details {
+            margin: 5px 0;
+            text-align: left;
+            color: #1f2937;
+            font-size: 14px;
+            display: none; /* Hidden by default */
+        }
+
+        .product-item .details.show {
+            display: block; /* Show when 'show' class is added */
+        }
+
+        .product-item .details span {
+            display: block;
+            margin-bottom: 3px; /* Reduced margin for compactness */
+        }
+
+        .product-item .product-info {
+            margin-bottom: 10px; /* Reverted to original spacing */
+            color: #1f2937;
+            font-size: 16px;
+        }
+
+        .product-item .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: auto; /* Push buttons to the bottom */
+        }
+
+        .product-item .button-group button {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .product-item .edit-button {
+            background-color: #28a745; /* Green for Edit */
+            color: #ffffff;
+        }
+
+        .product-item .edit-button:hover {
+            background-color: #218838; /* Darker Green on hover */
+        }
+
+        .product-item .delete-button {
+            background-color: #dc3545; /* Red for Delete */
+            color: #ffffff;
+        }
+
+        .product-item .delete-button:hover {
+            background-color: #c82333; /* Darker Red on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h2><span class="highlight">Crocs</span>Hub</h2>
+        </div>
+        <ul>
+            <li><a href="{% url 'adminindex' %}"><i class="bi bi-house"></i> Dashboard</a></li>
+            <li><a href="{% url 'gallery' %}"><i class="bi bi-plus-circle"></i> Upload a Product</a></li>
+            <li><a href="{% url 'admin_users' %}"><i class="bi bi-people"></i> View Registered Users</a></li>
+            <li><a href="{% url 'admin_orders' %}"><i class="bi bi-cart"></i> Orders</a></li>
+            <li><a href="{% url 'adminlogout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Products Grid</h1>
+        </div>
+
+        <div class="gallery-grid">
+            {% if gallery_images %}
+                {% for i in gallery_images %}
+                <div class="product-item">
+                    <div class="images">
+                        {% if i.feedimage1 %}
+                            <img src="{{ i.feedimage1.url }}" alt="Product Image" class="main-image">
+                        {% endif %}
+                        <div class="thumbnail-row">
+                            {% if i.feedimage2 %}
+                                <img src="{{ i.feedimage2.url }}" alt="Image 2">
+                            {% endif %}
+                            {% if i.feedimage3 %}
+                                <img src="{{ i.feedimage3.url }}" alt="Image 3">
+                            {% endif %}
+                            {% if i.feedimage4 %}
+                                <img src="{{ i.feedimage4.url }}" alt="Image 4">
+                            {% endif %}
+                            {% if i.feedimage5 %}
+                                <img src="{{ i.feedimage5.url }}" alt="Image 5">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="details">
+                        <span><strong>Name:</strong> {{ i.name }}</span>
+                        <span><strong>Model:</strong> {{ i.model }}</span>
+                        <span><strong>Price:</strong> {{ i.price }}</span>
+                        <span><strong>Quantity:</strong> {{ i.quantity }}</span>
+                        <span><strong>Category:</strong> {{ i.get_category_display }}</span>
+                        <span><strong>Description:</strong> {{ i.description|default:"No description available" }}</span>
+                    </div>
+                    <div class="product-info">
+                        {{ i.name }} - ${{ i.price }}
+                    </div>
+                    <div class="button-group">
+                        <a href="{% url 'edit_g' pk=i.id %}"><button class="edit-button">Edit</button></a>
+                        <a href="{% url 'deletion' i.id %}"><button class="delete-button">Delete</button></a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No products available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Add click event listener to each main product image
+        document.querySelectorAll('.main-image').forEach(image => {
+            image.addEventListener('click', () => {
+                // Find the closest product item (parent card)
+                const productItem = image.closest('.product-item');
+                // Find the details section within this specific card
+                const details = productItem.querySelector('.details');
+                // Toggle visibility of the details section for this card only
+                details.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>

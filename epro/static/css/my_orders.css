@@ -1,0 +1,267 @@
+/* ========== RESET ========== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ========== TOP NAVIGATION ========== */
+.topnav {
+    background-color: #000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    border-bottom: 1px solid #000;
+}
+
+.topnav p {
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* ========== ACCOUNT DROPDOWN ========== */
+.account-dropdown {
+    position: relative;
+    margin-right: 20px;
+    display: inline-block;
+}
+
+.account-button {
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.account-button i {
+    margin-right: 5px;
+}
+
+.account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    min-width: 178px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.account-dropdown:hover .account-menu {
+    display: block;
+}
+
+.account-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.account-menu a:hover {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+/* ========== MAIN NAVIGATION ========== */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #000;
+    padding: 10px 0;
+}
+
+.logo img {
+    width: 190px;
+    margin-left: 23px;
+}
+
+.left {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.left div {
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 19px;
+}
+
+.left a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.left a:hover {
+    color: #ff4081;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+
+.right form {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+.right form button {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-left: none;
+    background-color: #f0f0f0;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.right a {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.9rem;
+    position: relative;
+    margin-right: 26px;
+}
+
+.right a span {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4081;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+h2 {
+    text-align: center;
+    color: purple  !important;
+    margin: 20px 0;
+}
+
+
+
+/* ========== ORDERS TABLE ========== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.table thead {
+    background-color: #fafafa;
+    font-weight: 600;
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.table td:nth-child(4), .table td:nth-child(5) {
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .table thead {
+        display: none;
+    }
+
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table td {
+        padding: 10px;
+        position: relative;
+        text-align: right;
+    }
+
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: 600;
+        color: #666;
+    }
+}
+
+/* ========== FOOTER ========== */
+.footer {
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    padding: 50px 20px;
+    color: #aaa;
+    margin-top: auto;
+}
+
+.footer h4 {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: white;
+}
+
+.footer li {
+    list-style: none;
+    margin: 10px 0;
+    color: #777;
+}
+
+.footer div {
+    font-size: 15px;
+}
+
+.footlogo {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.foot2 {
+    flex: 1;
+}

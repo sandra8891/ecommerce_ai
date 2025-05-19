@@ -1,0 +1,262 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* ======= TOP NAVIGATION ======= */
+.topnav {
+    background-color: #000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+
+.topnav p {
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* ACCOUNT DROPDOWN */
+.account-dropdown {
+    position: relative;
+    margin-right: 20px;
+}
+
+.account-button {
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    overflow-y: auto;
+}
+
+.account-dropdown:hover .account-menu {
+    display: block;
+}
+
+.account-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+}
+
+.account-menu a:hover {
+    background-color: #f1f1f1;
+}
+
+/* ======= MAIN NAVIGATION ======= */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo img {
+    width: 140px;
+}
+
+.left {
+    display: flex;
+    gap: 20px;
+}
+
+.left div {
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.left a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.left a:hover {
+    color: #ff4081;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+}
+
+.right form button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-left: none;
+    background-color: #eee;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.right a {
+    position: relative;
+    font-size: 1.5rem;
+    color: #333;
+    text-decoration: none;
+}
+
+.right a span {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff4081;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+/* ======= WISHLIST ======= */
+h1 {
+    text-align: center;
+    color: rgb(190, 12, 190) ;
+    margin: 30px 0 10px;
+}
+
+.wishlist-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.wishlist-item {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 200px;
+}
+
+.wishlist-item img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.wishlist-item span {
+    display: block;
+    margin-top: 10px;
+}
+
+.wishlist-item a {
+    margin-top: 10px;
+    display: inline-block;
+    color: purple;
+    text-decoration: none;
+}
+
+.wishlist-item a:hover {
+    color: purple;
+}
+
+.back-to-home {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-to-home a {
+    text-decoration: none;
+    color: purple;
+}
+
+.back-to-home a:hover {
+    color: purple;
+}
+
+/* ======= FOOTER ======= */
+.footer {
+    background-color: #000;
+    color: #fff;
+    padding: 40px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.footer div {
+    flex: 1 1 200px;
+    margin: 10px;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px;
+}
+
+.footer h4 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.footer i {
+    margin-right: 10px;
+}
+
+.footlogo img {
+    width: 120px;
+    margin-bottom: 10px;
+}
+
+.footlogo i {
+    font-size: 20px;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .footer div {
+        margin: 20px 0;
+    }
+}
