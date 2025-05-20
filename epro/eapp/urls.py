@@ -30,7 +30,7 @@ urlpatterns = [
     path('remove-from-wishlist/<int:id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('add-to-wishlist/<int:id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/', views.wishlist_view, name='wishlist_view'),
-    path('search/', views.search_results, name='search_results'),
+    # path('search/', views.search_results, name='search_results'),
     path('myprofile/', views.myprofile, name='myprofile'),
     path('new-arrivals/', views.new_arrivals_page, name='new_arrivals_page'),
     path('category/<str:category>/', views.category_products, name='category_products'),
@@ -40,6 +40,7 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     # path('admin/orders/', views.admin_orders, name='admin_orders'),
+    path('search/', views.search_func, name='search_func'),
     
 
 ]

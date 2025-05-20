@@ -40,7 +40,8 @@
             <a href="{% url 'new_arrivals_page' %}"><div>NEW ARRIVALS</div></a>
         </div>
         <div class="right">
-            <form action="{% url 'search_results' %}" method="get">
+            <form action="{% url 'search_func' %}" method="get">
+                {% csrf_token %}
                 <input type="text" name="q" placeholder="Search " class="search-input">
                 <button type="submit"><i class="bi bi-search"></i></button>
             </form>

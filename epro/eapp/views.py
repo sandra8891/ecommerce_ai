@@ -17,6 +17,8 @@ import razorpay
 import json
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+import pandas as pd
+from sentence_transformers import SentenceTransformer
 
 
 
@@ -45,6 +47,8 @@ def types(request):
 
 def gallery(request):
     if request.method == 'POST':
+
+        # Get form data
         myimage1 = request.FILES.get('feedimage1')
         myimage2 = request.FILES.get('feedimage2')
         myimage3 = request.FILES.get('feedimage3')
@@ -53,49 +57,46 @@ def gallery(request):
         name = request.POST.get("todo")
         price = request.POST.get("date")
         quantity = request.POST.get("quantity")
-        model = request.POST.get("model")
+        model_type = request.POST.get("model")
         description = request.POST.get("description")
         category = request.POST.get("category")
 
         # Basic validation
-        if not name or not price or not quantity or not model or not category:
+        if not name or not price or not quantity or not model_type or not category:
             messages.error(request, "Please fill in all required fields.")
             return render(request, "galleryupload.html")
 
-        try:
-            obj = Gallery(
-                name=name,
-                model=model,
-                quantity=quantity,
-                price=price,
-                feedimage1=myimage1,
-                feedimage2=myimage2,
-                feedimage3=myimage3,
-                feedimage4=myimage4,
-                feedimage5=myimage5,
-                description=description,
-                user=request.user,
-                category=category
-            )
-            obj.save()
-            df = pd.DataFrame([{
-                "id": obj.id,
-                "name": name,
-                "rating": 0,
-                "category":category.name,
-                "description": description,
-                "reviews": '',
-            }])
-            product_vector = vectorize_product_with_reviews(df)
-            print(product_vector)
-            obj.vector_data = json.dumps(product_vector[0].tolist())
-            obj.save()
-            messages.success(request, "Product uploaded successfully!")
-            return redirect('adminindex')
-        except Exception as e:
-            messages.error(request, f"Error uploading product: {str(e)}")
-            return render(request, "galleryupload.html")
+        # Create and save the gallery object
+        obj = Gallery(
+            name=name,
+            model=model_type,
+            quantity=quantity,
+            price=price,
+            feedimage1=myimage1,
+            feedimage2=myimage2,
+            feedimage3=myimage3,
+            feedimage4=myimage4,
+            feedimage5=myimage5,
+            description=description,
+            user=request.user,
+            category=category
+        )
+        obj.save()
 
+        df = pd.DataFrame([{
+            "id": obj.id,
+            "name": name,
+            "rating": 0,
+            "category": category,
+            "description": description,
+            "reviews": '',
+        }])
+        
+        # Generate product vector
+        product_vector = vectorize_product_with_reviews(df.iloc[0])
+        print(product_vector)
+        obj.vector_data = json.dumps(product_vector[0].tolist())
+        obj.save()
     return render(request, "galleryupload.html")
 
 
@@ -120,6 +121,8 @@ def usersignup(request):
         
             user = User.objects.create_user(username=username, email=email, password=password)
             user.save()
+            dt= users.objects.create(user=user)
+            dt.save()
             user_datas = [{
                 "user_id": user.id,
                 "product":'',
@@ -128,8 +131,8 @@ def usersignup(request):
             df=pd.DataFrame(user_datas)
             user_vectors = vectorize_user_with_search(df)
             # print('User vector in register',user_vectors)
-            user.vector_data = json.dumps(user_vectors[0].tolist())
-            user.save()
+            dt.vector_data = json.dumps(user_vectors[0].tolist())
+            dt.save()
             messages.success(request, "Account created successfully!")
             return redirect('loginuser')  
 
@@ -325,20 +328,47 @@ def passwordreset(request):
 
 
 def products(request, id):
-    gallery_images = Gallery.objects.filter(pk=id)
+    gallery_image = get_object_or_404(Gallery, pk=id)
     if request.user.is_authenticated:
         cart_item_count = Cart.objects.filter(user=request.user).count()
         # Check if the product is in the user's cart
-        for image in gallery_images:
+        for image in gallery_image:
             image.in_cart = Cart.objects.filter(user=request.user, product=image).exists()
     else:
         cart_item_count = 0
-        for image in gallery_images:
+        for image in gallery_image:
             image.in_cart = False 
-    
+            
+    user = request.user
+    user_name, created = users.objects.get_or_create(user=user)
+
+    ViewHistory.objects.create(user=user_name, product=gallery_image)
+    # Prepare view history data for vectorization
+    existing_user_data = ViewHistory.objects.filter(user=user_name)
+    existing_products = [history.product.name for history in existing_user_data]
+    data = [{
+        'user_id': user_name.id,
+        'product': ','.join(existing_products),
+        'search': ''
+    }]
+    df = pd.DataFrame(data)
+
+    # Vectorize and save
+    try:
+        user_vectors = vectorize_user_with_search(df)
+        user_name.vector_data = json.dumps(user_vectors[0].tolist())
+        user_name.save()
+    except Exception as e:
+        print(f"Vectorization failed: {e}")
+
+    # Fetch reviews
+    rs = reviews.objects.filter(pname=gallery_image)
+    isReviewed = reviews.objects.filter(uname=user_name, pname=gallery_image).exists()
     return render(request, 'products.html', {
-        "gallery_images": gallery_images,
-        "cart_item_count": cart_item_count
+        "gallery_images": gallery_image,
+        "cart_item_count": cart_item_count,
+        'isReviewed': isReviewed,
+        'reviews': rs,
     })
 
 
@@ -449,19 +479,82 @@ def remove_from_wishlist(request, id):
     return redirect('wishlist_view')
 
 
-def search_results(request):
-    query = request.GET.get('q')  # Get the search query from the GET parameters
-    results = None  # Default to None if there's no query
+# def search_results(request):
+#     query = request.GET.get('q')  
+#     results = None  
+#     if query:
+#         results = Gallery.objects.filter(
+#             name__icontains=query
+#         ) | Gallery.objects.filter(
+#             model__icontains=query
+#         )
     
-    if query:
-        # Filter Gallery by name or model using the query, case insensitive
-        results = Gallery.objects.filter(
-            name__icontains=query
-        ) | Gallery.objects.filter(
-            model__icontains=query
-        )
+#     return render(request, 'search_results.html', {'results': results, 'query': query})
+def types(request):
+    type2 = []
+    for i in Gallery.objects.all():
+        if i.category and i.category.name not in type2:
+            type2.append(i.category.name)
+    return type2
+
+def search_func(request):
+    if request.method == 'POST':
+        inp = request.POST['search']
+
+
+        auth_user = None
+        users_data = None
+
+        if 'user' in request.session:
+            try:
+                auth_user = User.objects.get(username=request.session['user'])
+                users_data = users.objects.get(name=auth_user)
+            except (User.DoesNotExist, users.DoesNotExist):
+                auth_user = None
+                users_data = None
+
+            if users_data and auth_user:
+                # Save search query
+                SearchHistory.objects.create(query=inp, user=users_data)
+
+                # Get user search history
+                user_search = SearchHistory.objects.filter(user=users_data)
+                user_search = [s.query for s in user_search]
+
+                # Get view history
+                user_products = ViewHistory.objects.filter(user=users_data)
+                user_products = [s.product.name for s in user_products]
+
+                # Prepare data for vectorization
+                user_data = [{
+                    'user_id': auth_user.id,
+                    'product': ','.join(user_products) if user_products else '',
+                    'search': ','.join(user_search) if user_search else ''
+                }]
+
+                df = pd.DataFrame(user_data)
+
+                # Vectorize
+                user_vectors = vectorize_user_with_search(df)
+                users_data.vector_data = json.dumps(user_vectors[0].tolist())
+                users_data.save()
+
+        # Search for products by name or category
+        products_by_name = Gallery.objects.filter(name__icontains=inp)  # Changed from iexact to icontains
+        products_by_category = Gallery.objects.filter(category__name__icontains=inp)  # Changed from iexact to icontains
+        pro_name = (products_by_name | products_by_category).distinct()
+
+        
+
+        return render(request, 'user/search_results.html', {
+            'category': types(request),
+            'user': getuser(request),
+            'query': inp,
+            'products': pro_name
+        })
     
-    return render(request, 'search_results.html', {'results': results, 'query': query})
+    # Handle GET requests - redirect to home or show empty search
+    return redirect('firstpage')  # Or another appropriate action
 
 
 @login_required
@@ -906,6 +999,48 @@ def razorpay_callback(request):
         except Order.DoesNotExist:
             messages.error(request, 'Order not found.')
             return redirect('my_orders')
+        
+        
+        
+        
+def addReview(request, pk):
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        description = request.POST.get('description')
+        
+        prod = get_object_or_404(Gallery, pk=pk)
+        userss = get_object_or_404(User, username=request.session.get('user'))
+        user = get_object_or_404(users, name=userss)
+
+        # Save review
+        data = reviews.objects.create(rating=rating, description=description, uname=user, pname=prod)
+        data.save()
+
+        # Update average rating
+        rev = reviews.objects.filter(pname=prod)
+        total = [i.rating for i in rev] 
+        prod.rating = round(sum(total) / len(total), 1) if total else rating
+        prod.save()
+
+        # Prepare data for vectorization
+        comments = [i.description for i in rev]
+        pro_data = [{
+            "pro_id": prod.id,
+            "name": prod.name,
+            "rating": prod.rating,
+            "category": prod.category.name if prod.category else "",  # ✅ Safe foreign key access
+            "description": prod.description,
+            "reviews": ','.join(comments)
+        }]
+        print(pro_data)
+        df = pd.DataFrame(pro_data)
+        product_vector = vectorize_product_with_reviews(df)
+        prod.vector_data = json.dumps(product_vector[0].tolist())
+        prod.save()
+
+        return redirect(reverse('product', args=[pk]))
+    
+    return redirect(reverse('product', args=[pk]))  # fallback redirect
         
         
         

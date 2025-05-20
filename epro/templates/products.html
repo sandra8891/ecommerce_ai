@@ -39,7 +39,7 @@
             <a href="{% url 'new_arrivals_page' %}"><div>NEW ARRIVALS</div></a>
         </div>
         <div class="right">
-            <form action="{% url 'search_results' %}" method="get">
+            <form action="{% url 'search_func' %}" method="get">
                 <input type="text" name="q" placeholder="Search " class="search-input">
                 <button type="submit"><i class="bi bi-search"></i></button>
             </form>
@@ -101,6 +101,93 @@
             </div>
         {% endfor %}
     </div>
+     <!-- Reviews Section -->
+        <div class="product-reviews-container">
+            <h2 class="product-section-title">Reviews & Ratings</h2>
+            
+            <!-- Display Current Rating -->
+            <div class="product-rating-box">
+                <div class="product-rating-summary">
+                    <div class="product-rating-average">
+                        <span class="product-rating-number">{{ product.rating }}</span>
+                        <div class="product-rating-stars">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= product.rating|floatformat:"0" %}
+                                    <span class="product-star product-filled">★</span>
+                                {% else %}
+                                    <span class="product-star">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="product-rating-count">Based on {{ reviews.count }} reviews</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Review Form -->
+            {% if request.session.user %}
+            <div class="product-add-review">
+                <h3>Write a Review</h3>
+                <form method="POST" action="{% url 'addReview' product.id %}">
+                    {% csrf_token %}
+                    <div class="product-rating-input">
+                        <label for="product-rating">Your Rating:</label>
+                        <div class="product-star-rating">
+                            <select name="rating" id="product-rating" required>
+                                <option value="" disabled selected>Select your rating</option>
+                                <option value="5">★★★★★ (5 stars)</option>
+                                <option value="4">★★★★☆ (4 stars)</option>
+                                <option value="3">★★★☆☆ (3 stars)</option>
+                                <option value="2">★★☆☆☆ (2 stars)</option>
+                                <option value="1">★☆☆☆☆ (1 star)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="product-review-input">
+                        <label for="product-description">Your Review:</label>
+                        <textarea id="product-description" name="description" rows="4" required placeholder="Share your experience with this product..."></textarea>
+                    </div>
+                    <button type="submit" class="product-review-btn product-review-btn-primary">Submit Review</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="product-login-prompt">
+                <p>Please <a href="{% url 'login' %}">login</a> to leave a review.</p>
+            </div>
+            {% endif %}
+            
+            <!-- Display Reviews -->
+            <div class="product-review-list">
+                <h3>Customer Reviews</h3>
+                {% if reviews %}
+                    {% for review in reviews %}
+                    <div class="product-review-item">
+                        <div class="product-review-header">
+                            <div class="product-reviewer-name">{{ review.uname.name.username }}</div>
+                            <div class="product-review-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <span class="product-star product-filled">★</span>
+                                    {% else %}
+                                        <span class="product-star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="product-review-content">
+                            {{ review.description }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="product-no-reviews">
+                        <p>No reviews yet. Be the first to review this product!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
 
     <div class="footer">
         <div class="footlogo">
