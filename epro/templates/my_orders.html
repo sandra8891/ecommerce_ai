@@ -61,34 +61,44 @@
 </div><br>
 
 
-   <h2>My Orders</h2><br><br>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Payment Method</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order in orders %}
-        <tr>
-            <td data-label="Product">{{ order.product.name }}</td>
-            <td data-label="Quantity">{{ order.quantity }}</td>
-            <td data-label="Price">{{ order.product.price }}</td>
-            <td data-label="Total">{{ order.total_price }}</td>
-            <td data-label="Status">{{ order.status }}</td>
-            <td data-label="Payment Method">{{ order.payment_method }}</td>
-            <td data-label="Date">{{ order.created_at|date:"Y-m-d" }}</td>
+   <div class="orders-container">
+        <h2>My Orders</h2>
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td data-label="Product">{{ order.product.name }}</td>
+                    <td data-label="Quantity">{{ order.quantity }}</td>
+                    <td data-label="Total Price">{{ order.total_price|floatformat:2 }}</td>
+                    <td data-label="Status">{{ order.get_status_display }}</td>
+                    <td data-label="Payment Method">{{ order.payment_method }}</td>
+                    <td data-label="Date">{{ order.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        {% if not orders %}
+            <p>No orders found.</p>
+        {% endif %}
+    </div>
 
 
 <div class="footer">

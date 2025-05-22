@@ -16,6 +16,6 @@ def recommend_product(user_input, product_vectors, product_ids, top_n=3):
     
     # Sort courses by similarity
     sorted_indices = np.argsort(similarity_scores)[::-1]  # Descending sort
-    recommended_courses = [(product_ids[idx], similarity_scores[idx]) for idx in sorted_indices[:top_n]]
+    recommended_products = [(product_ids[idx], similarity_scores[idx]) for idx in sorted_indices[:top_n]]
     
-    return recommended_courses
+    return recommended_products

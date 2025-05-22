@@ -35,6 +35,7 @@
                     <th>Status</th>
                     <th>Payment Method</th>
                     <th>Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +48,16 @@
                     <td data-label="Product">{{ order.product.name }}</td>
                     <td data-label="Quantity">{{ order.quantity }}</td>
                     <td data-label="Total Price">{{ order.total_price|floatformat:2 }}</td>
-                    <td data-label="Status">{{ order.status }}</td>
+                    <td data-label="Status">
+                        <form action="{% url 'update_order_status' order.id %}" method="POST">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()">
+                                {% for status_value, status_label in order.STATUS_CHOICES %}
+                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
                     <td data-label="Payment Method">{{ order.payment_method }}</td>
                     <td data-label="Date">{{ order.created_at|date:"Y-m-d" }}</td>
                 </tr>
@@ -58,8 +68,6 @@
         {% if not orders %}
             <p>No orders found.</p>
         {% endif %}
-
-        <!-- <a href="{% url 'adminindex' %}" class="back-btn">Back to Admin Index</a> -->
     </div>
 </body>
 </html>

@@ -41,7 +41,10 @@ urlpatterns = [
     path('razorpay_callback/', views.razorpay_callback, name='razorpay_callback'),
     # path('admin/orders/', views.admin_orders, name='admin_orders'),
     path('search/', views.search_func, name='search_func'),
+    path('addReview/<int:pk>/', views.addReview, name='addReview'),
+    path('update_order_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
     
+
 
 ]
 

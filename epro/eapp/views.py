@@ -15,10 +15,17 @@ from django.views.decorators.csrf import csrf_exempt
 from .vectorize import vectorize_product_with_reviews,vectorize_user_with_search,pd
 import razorpay
 import json
+from .read_content import *
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 import pandas as pd
 from sentence_transformers import SentenceTransformer
+from django.db.models import Q
+from django.db.models import Case, When
+import numpy as np
+import torch
+import logging
+
 
 
 
@@ -37,12 +44,15 @@ def filter_price(data, price):
     return price2
 
 
-def types(request):
-    type2 = []
-    for i in Gallery.objects.all():
-        if i.category and i.category.name not in type2:
-            type2.append(i.category.name)
-    return type2
+# def types(request):
+#     type2 = []
+#     for i in Gallery.objects.all():
+#         if i.category and i.category.name not in type2:
+#             type2.append(i.category.name)
+#     return type2
+
+
+
 
 
 def gallery(request):
@@ -181,20 +191,81 @@ def admin_users(request):
 
 
 
-def firstpage(request): 
-    gallery_images = Gallery.objects.all()  
-    if request.user.is_authenticated:
-        cart_item_count = Cart.objects.filter(user=request.user).count()
-        wishlist_item_count = Wishlist.objects.filter(user=request.user).count() 
-    else:
-        cart_item_count = 0 
-        wishlist_item_count = 0
-    return render(request, "userindex.html", {
-        "gallery_images": gallery_images,
-        "cart_item_count": cart_item_count,
-        "wishlist_item_count": wishlist_item_count,
+# def firstpage(request): 
+#     gallery_images = Gallery.objects.all()  
+#     if request.user.is_authenticated:
+#         cart_item_count = Cart.objects.filter(user=request.user).count()
+#         wishlist_item_count = Wishlist.objects.filter(user=request.user).count() 
+#     else:
+#         cart_item_count = 0 
+#         wishlist_item_count = 0
+#     return render(request, "userindex.html", {
+#         "gallery_images": gallery_images,
+#         "cart_item_count": cart_item_count,
+#         "wishlist_item_count": wishlist_item_count,
         
+#     })
+def firstpage(request):
+    # Fetch all required Gallery objects in one query
+    all_products = Gallery.objects.select_related('user').all()
+
+    # Prepare product vectors and IDs for recommendations
+    product_ids = []
+    product_vectors = []
+    for product in all_products:
+        if product.vector_data:
+            try:
+                vector = json.loads(product.vector_data)
+                product_ids.append(product.pk)
+                product_vectors.append(vector)
+            except json.JSONDecodeError:
+                logger.warning(f"Invalid vector_data for Gallery ID {product.pk}")
+                continue
+
+    # Convert to tensor
+    product_vectors = torch.tensor(product_vectors, dtype=torch.float32) if product_vectors else torch.tensor([], dtype=torch.float32)
+
+    # Initialize recommended products
+    recommended_products = []
+
+    # Generate recommendations for authenticated user
+    if request.user.is_authenticated:
+        try:
+            user_obj = users.objects.select_related('user').get(user=request.user)
+            if user_obj.vector_data:
+                user_vector = torch.tensor(json.loads(user_obj.vector_data), dtype=torch.float32)
+                if product_vectors.numel() > 0:
+                    recommended = recommend_product(user_vector, product_vectors, product_ids, top_n=4)
+                    product_pks = [rec[0] for rec in recommended]
+                    preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(product_pks)])
+                    recommended_products = all_products.filter(pk__in=product_pks).order_by(preserved_order)
+        except users.DoesNotExist:
+            logger.info(f"No user profile for {request.user.username}")
+        except json.JSONDecodeError:
+            logger.warning(f"Invalid vector_data for user {request.user.username}")
+        except Exception as e:
+            logger.error(f"Recommendation error for user {request.user.username}: {str(e)}")
+
+    # Fallback to random products if no recommendations
+    if not recommended_products:
+        recommended_products = all_products.order_by('?')[:4]
+
+    # Get new arrivals (limit to 10 for consistency with template)
+    gallery_images = all_products.order_by('-id')[:10]
+
+    # Cart and wishlist counts
+    cart_item_count = Cart.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
+    wishlist_item_count = Wishlist.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
+
+    return render(request, "userindex.html", {
+        'gallery_images': gallery_images,
+        'products': recommended_products,  # Match template variable
+        'cart_item_count': cart_item_count,
+        'wishlist_item_count': wishlist_item_count,
     })
+
+
+
 
 
 
@@ -328,21 +399,21 @@ def passwordreset(request):
 
 
 def products(request, id):
-    gallery_image = get_object_or_404(Gallery, pk=id)
+    gallery_image = get_object_or_404(Gallery, pk=id)  # Renamed to singular for clarity
+    cart_item_count = 0
+    gallery_image.in_cart = False
+
     if request.user.is_authenticated:
         cart_item_count = Cart.objects.filter(user=request.user).count()
         # Check if the product is in the user's cart
-        for image in gallery_image:
-            image.in_cart = Cart.objects.filter(user=request.user, product=image).exists()
-    else:
-        cart_item_count = 0
-        for image in gallery_image:
-            image.in_cart = False 
-            
+        gallery_image.in_cart = Cart.objects.filter(user=request.user, product=gallery_image).exists()
+
     user = request.user
     user_name, created = users.objects.get_or_create(user=user)
 
+    # Save view history
     ViewHistory.objects.create(user=user_name, product=gallery_image)
+
     # Prepare view history data for vectorization
     existing_user_data = ViewHistory.objects.filter(user=user_name)
     existing_products = [history.product.name for history in existing_user_data]
@@ -365,10 +436,11 @@ def products(request, id):
     rs = reviews.objects.filter(pname=gallery_image)
     isReviewed = reviews.objects.filter(uname=user_name, pname=gallery_image).exists()
     return render(request, 'products.html', {
-        "gallery_images": gallery_image,
+        "gallery_image": gallery_image,  # Pass single object
         "cart_item_count": cart_item_count,
         'isReviewed': isReviewed,
         'reviews': rs,
+        'product': gallery_image,  # Pass as product for rating context
     })
 
 
@@ -490,71 +562,96 @@ def remove_from_wishlist(request, id):
 #         )
     
 #     return render(request, 'search_results.html', {'results': results, 'query': query})
+
+
+
+
 def types(request):
-    type2 = []
-    for i in Gallery.objects.all():
-        if i.category and i.category.name not in type2:
-            type2.append(i.category.name)
-    return type2
+    return list(Gallery.objects.values_list('category', flat=True).distinct())
 
 def search_func(request):
-    if request.method == 'POST':
-        inp = request.POST['search']
+    if request.method == 'GET':
+        query = request.GET.get('q', '').strip()
+        if not query:
+            return redirect('firstpage')  # Redirect if query is empty
 
+        # Initialize context
+        context = {
+            'query': query,
+            'results': [],  # Match template variable
+            'cart_item_count': 0,
+            'wishlist_item_count': 0,
+        }
 
-        auth_user = None
-        users_data = None
-
-        if 'user' in request.session:
+        # Handle authenticated user
+        if request.user.is_authenticated:
             try:
-                auth_user = User.objects.get(username=request.session['user'])
-                users_data = users.objects.get(name=auth_user)
-            except (User.DoesNotExist, users.DoesNotExist):
-                auth_user = None
-                users_data = None
-
-            if users_data and auth_user:
+                user_obj = users.objects.get(user=request.user)  # Use user field, not name
                 # Save search query
-                SearchHistory.objects.create(query=inp, user=users_data)
+                SearchHistory.objects.create(query=query, user=user_obj)
 
-                # Get user search history
-                user_search = SearchHistory.objects.filter(user=users_data)
-                user_search = [s.query for s in user_search]
-
-                # Get view history
-                user_products = ViewHistory.objects.filter(user=users_data)
-                user_products = [s.product.name for s in user_products]
+                # Get user search and view history
+                user_search = [s.query for s in SearchHistory.objects.filter(user=user_obj)]
+                user_products = [p.product.name for p in ViewHistory.objects.filter(user=user_obj)]
 
                 # Prepare data for vectorization
                 user_data = [{
-                    'user_id': auth_user.id,
+                    'user_id': request.user.id,
                     'product': ','.join(user_products) if user_products else '',
                     'search': ','.join(user_search) if user_search else ''
                 }]
-
                 df = pd.DataFrame(user_data)
 
-                # Vectorize
+                # Update user vector
                 user_vectors = vectorize_user_with_search(df)
-                users_data.vector_data = json.dumps(user_vectors[0].tolist())
-                users_data.save()
+                user_obj.vector_data = json.dumps(user_vectors[0].tolist())
+                user_obj.save()
 
-        # Search for products by name or category
-        products_by_name = Gallery.objects.filter(name__icontains=inp)  # Changed from iexact to icontains
-        products_by_category = Gallery.objects.filter(category__name__icontains=inp)  # Changed from iexact to icontains
-        pro_name = (products_by_name | products_by_category).distinct()
+                # Cart and wishlist counts
+                context['cart_item_count'] = Cart.objects.filter(user=request.user).count()
+                context['wishlist_item_count'] = Wishlist.objects.filter(user=request.user).count()
+            except users.DoesNotExist:
+                logger.info(f"No user profile for {request.user.username}")
 
-        
+        # Search products by name or category
+        results = Gallery.objects.filter(
+            Q(name__icontains=query) | Q(category__icontains=query)
+        ).distinct()
 
-        return render(request, 'user/search_results.html', {
-            'category': types(request),
-            'user': getuser(request),
-            'query': inp,
-            'products': pro_name
-        })
-    
-    # Handle GET requests - redirect to home or show empty search
-    return redirect('firstpage')  # Or another appropriate action
+        # Optional: Enhance with vector-based search
+        if results and request.user.is_authenticated and user_obj.vector_data:
+            try:
+                user_vector = torch.tensor(json.loads(user_obj.vector_data), dtype=torch.float32)
+                product_ids = []
+                product_vectors = []
+                for product in results:
+                    if product.vector_data:
+                        try:
+                            vector = json.loads(product.vector_data)
+                            product_ids.append(product.pk)
+                            product_vectors.append(vector)
+                        except json.JSONDecodeError:
+                            logger.warning(f"Invalid vector_data for Gallery ID {product.pk}")
+                            continue
+
+                if product_vectors:
+                    product_vectors = torch.tensor(product_vectors, dtype=torch.float32)
+                    similarities = util.cos_sim(user_vector, product_vectors)
+                    similarity_scores = similarities[0].cpu().numpy()
+                    sorted_indices = np.argsort(similarity_scores)[::-1]
+                    top_n = min(10, len(product_ids))  # Limit to 10 results
+                    top_product_ids = [product_ids[idx] for idx in sorted_indices[:top_n]]
+                    preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(top_product_ids)])
+                    results = results.filter(pk__in=top_product_ids).order_by(preserved_order)
+            except Exception as e:
+                logger.error(f"Vector search error for user {request.user.username}: {str(e)}")
+
+        context['results'] = results
+        context['category'] = types(request)
+
+        return render(request, 'search_results.html', context)
+
+    return redirect('firstpage')  # Redirect for non-GET requests
 
 
 @login_required
@@ -872,6 +969,7 @@ def buy_now(request, product_id):
     return render(request, 'buy_now.html', context)
 
 
+@login_required
 def my_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     
@@ -893,6 +991,64 @@ def admin_orders(request):
     return render(request, 'admin_orders.html', {'orders': orders})
 
 
+@staff_member_required
+def update_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    if request.method == "POST":
+        new_status = request.POST.get('status')
+        print(f"Order ID: {order_id}, New Status: {new_status}, Order Email: {order.email}, User Email: {order.user.email}")
+        if new_status in dict(Order.STATUS_CHOICES).keys():
+            if order.status == new_status:
+                messages.info(request, "Order status is already set to this value.")
+                return redirect('admin_orders')
+                
+            old_status = order.status
+            order.status = new_status
+            order.save()
+
+            # Use order.email or fallback to user.email
+            recipient_email = order.email or order.user.email
+            if not recipient_email:
+                logger.warning(f"No email address provided for order {order.id} (User: {order.user.username})")
+                messages.warning(request, f"Order status updated to {new_status}, but no email address found.")
+                return redirect('admin_orders')
+
+            # Send email notification
+            subject = f'Order {order.id} Status Update'
+            message = (
+                f'Dear {order.user.username},\n\n'
+                f'The status of your order (ID: {order.id}) for {order.product.name} has been updated.\n'
+                f'Previous Status: {dict(Order.STATUS_CHOICES).get(old_status)}\n'
+                f'New Status: {dict(Order.STATUS_CHOICES).get(new_status)}\n\n'
+                f'Thank you for shopping with CrocsHub!'
+            )
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [recipient_email]
+            print(f"Sending email to: {recipient_list}, Subject: {subject}")
+            
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=email_from,
+                    recipient_list=recipient_list,
+                    fail_silently=False,
+                )
+                messages.success(request, f"Order status updated to {new_status} and email sent to {recipient_email}.")
+            except Exception as e:
+                logger.error(f"Failed to send email for order {order.id} to {recipient_email}: {str(e)}")
+                print(f"Email error: {str(e)}")
+                error_message = "Order status updated, but email could not be sent. "
+                if "535" in str(e):
+                    error_message += "Check your Gmail SMTP credentials (username/password or App Password)."
+                else:
+                    error_message += f"Error: {str(e)}"
+                messages.warning(request, error_message)
+        else:
+            messages.error(request, "Invalid status selected.")
+    
+    return redirect('admin_orders')
 
 
 
@@ -1003,45 +1159,191 @@ def razorpay_callback(request):
         
         
         
+# @login_required
+# def addReview(request, pk):
+#     try:
+#         prod = Gallery.objects.get(pk=pk)
+#     except Gallery.DoesNotExist:
+#         messages.error(request, "Product not found.")
+#         return redirect('firstpage')
+
+#     if request.method == 'POST':
+#         rating = request.POST.get('rating')
+#         description = request.POST.get('description')
+
+#         # Validate inputs
+#         if not rating or not description:
+#             messages.error(request, "Rating and description are required.")
+#             return redirect(reverse('products', args=[pk]))
+
+#         try:
+#             rating = int(rating)
+#             if rating < 1 or rating > 5:
+#                 raise ValueError
+#         except ValueError:
+#             messages.error(request, "Invalid rating. Please select a rating between 1 and 5.")
+#             return redirect(reverse('products', args=[pk]))
+
+#         try:
+#             user_profile = users.objects.get(user=request.user)
+#         except users.DoesNotExist:
+#             messages.error(request, "User profile not found. Please contact support.")
+#             return redirect('userlogin')
+
+#         # Check for existing review
+#         if reviews.objects.filter(uname=user_profile, pname=prod).exists():
+#             messages.error(request, "You have already reviewed this product.")
+#             return redirect(reverse('products', args=[pk]))
+
+#         # Create and save review
+#         data = reviews.objects.create(
+#             rating=rating,
+#             description=description,
+#             uname=user_profile,
+#             pname=prod
+#         )
+#         data.save()
+
+#         # Update product rating
+#         rev = reviews.objects.filter(pname=prod)
+#         total = [i.rating for i in rev]
+#         if total:
+#             total_rating = round(sum(total) / len(total), 1)
+#             prod.rating = total_rating
+#         else:
+#             prod.rating = rating
+#         prod.save()
+
+#         # Vectorize product with reviews
+#         comments = [i.description for i in rev]
+#         pro_data = [{
+#             "pro_id": prod.id,
+#             "name": prod.name,
+#             "rating": prod.rating,
+#             "model": getattr(prod, 'model', ''),
+#             "reviews": ','.join(comments)
+#         }]
+#         df = pd.DataFrame(pro_data)
+#         try:
+#             product_vector = vectorize_product_with_reviews(df)
+#             prod.vector_data = json.dumps(product_vector[0].tolist())
+#             prod.save()
+#         except Exception as e:
+#             print(f"Vectorization failed: {e}")
+#             messages.warning(request, "Review saved, but vectorization failed. Contact support.")
+
+#         messages.success(request, "Review submitted successfully!")
+#         return redirect(reverse('products', args=[pk]))  # Updated to 'products'
+#     else:
+#         reviews_list = reviews.objects.filter(pname=prod)
+#         cart_items = Cart.objects.filter(user=request.user)
+#         cart_product_ids = [item.product.id for item in cart_items]
+#         isReviewed = reviews.objects.filter(uname__user=request.user, pname=prod).exists()
+#         context = {
+#             'gallery_images': [prod],
+#             'reviews': reviews_list,
+#             'cart_product_ids': cart_product_ids,
+#             'isReviewed': isReviewed
+#         }
+#         return render(request, 'products.html', context)
+
+
+logger = logging.getLogger(__name__)
+
+@login_required
 def addReview(request, pk):
+    try:
+        prod = get_object_or_404(Gallery, pk=pk)
+    except Gallery.DoesNotExist:
+        messages.error(request, "Product not found.")
+        return redirect('firstpage')
+
     if request.method == 'POST':
         rating = request.POST.get('rating')
         description = request.POST.get('description')
-        
-        prod = get_object_or_404(Gallery, pk=pk)
-        userss = get_object_or_404(User, username=request.session.get('user'))
-        user = get_object_or_404(users, name=userss)
 
-        # Save review
-        data = reviews.objects.create(rating=rating, description=description, uname=user, pname=prod)
+        # Validate inputs
+        if not rating or not description:
+            messages.error(request, "Rating and description are required.")
+            return redirect(reverse('products', args=[pk]))
+
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                raise ValueError
+        except ValueError:
+            messages.error(request, "Invalid rating. Please select a rating between 1 and 5.")
+            return redirect(reverse('products', args=[pk]))
+
+        # Get or create user profile
+        try:
+            user_profile = users.objects.get(user=request.user)
+        except users.DoesNotExist:
+            messages.error(request, "User profile not found. Please contact support.")
+            return redirect('loginuser')
+
+        # Check for existing review
+        if reviews.objects.filter(uname=user_profile, pname=prod).exists():
+            messages.error(request, "You have already reviewed this product.")
+            return redirect(reverse('products', args=[pk]))
+
+        # Create and save review
+        data = reviews.objects.create(
+            rating=rating,
+            description=description,
+            uname=user_profile,  # Associate with user_profile
+            pname=prod
+        )
         data.save()
 
-        # Update average rating
+        # Update product rating
         rev = reviews.objects.filter(pname=prod)
-        total = [i.rating for i in rev] 
-        prod.rating = round(sum(total) / len(total), 1) if total else rating
+        total = [i.rating for i in rev]
+        if total:
+            total_rating = round(sum(total) / len(total), 1)
+            prod.rating = total_rating
+        else:
+            prod.rating = rating
         prod.save()
 
-        # Prepare data for vectorization
+        # Vectorize product with reviews
         comments = [i.description for i in rev]
         pro_data = [{
             "pro_id": prod.id,
             "name": prod.name,
             "rating": prod.rating,
-            "category": prod.category.name if prod.category else "",  # ✅ Safe foreign key access
-            "description": prod.description,
+            "model": getattr(prod, 'model', ''),
             "reviews": ','.join(comments)
         }]
-        print(pro_data)
         df = pd.DataFrame(pro_data)
-        product_vector = vectorize_product_with_reviews(df)
-        prod.vector_data = json.dumps(product_vector[0].tolist())
-        prod.save()
+        try:
+            product_vector = vectorize_product_with_reviews(df)
+            prod.vector_data = json.dumps(product_vector[0].tolist())
+            prod.save()
+        except Exception as e:
+            logger.error(f"Vectorization failed: {e}")
+            messages.warning(request, "Review saved, but vectorization failed. Contact support.")
 
-        return redirect(reverse('product', args=[pk]))
-    
-    return redirect(reverse('product', args=[pk]))  # fallback redirect
-        
+        messages.success(request, "Review submitted successfully!")
+        return redirect(reverse('products', args=[pk]))
+
+    # GET request: Display the product and reviews
+    reviews_list = reviews.objects.filter(pname=prod)
+    cart_items = Cart.objects.filter(user=request.user)
+    cart_product_ids = [item.product.id for item in cart_items]
+    isReviewed = reviews.objects.filter(uname__user=request.user, pname=prod).exists()
+    context = {
+        'gallery_image': prod,  # Changed to singular for consistency
+        'reviews': reviews_list,
+        'cart_product_ids': cart_product_ids,
+        'isReviewed': isReviewed,
+        'cart_item_count': cart_items.count(),
+    }
+    return render(request, 'products.html', context)
+
+
+
+       
         
         
         
