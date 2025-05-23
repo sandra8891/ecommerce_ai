@@ -408,6 +408,7 @@ body {
 
 /* ========== FOOTER ========== */
 .footer {
+    position: fixed;
     background-color: black;
     display: flex;
     height: 350px;

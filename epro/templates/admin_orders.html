@@ -42,9 +42,9 @@
                 {% for order in orders %}
                 <tr>
                     <td data-label="User">{{ order.user.username }}</td>
-                    <td data-label="Email">{{ order.user.email }}</td>
-                    <td data-label="Phone">{{ order.user.userprofile.phone_number|default_if_none:"N/A" }}</td>
-                    <td data-label="Address">{{ order.user.userprofile.address|default_if_none:"N/A" }}</td>
+                    <td data-label="Email">{{ order.email|default_if_none:"N/A" }}</td>
+                    <td data-label="Phone">{{ order.phone_number|default_if_none:"N/A" }}</td>
+                    <td data-label="Address">{{ order.address|default_if_none:"N/A" }}</td>
                     <td data-label="Product">{{ order.product.name }}</td>
                     <td data-label="Quantity">{{ order.quantity }}</td>
                     <td data-label="Total Price">{{ order.total_price|floatformat:2 }}</td>
@@ -53,6 +53,8 @@
                             {% csrf_token %}
                             <select name="status" onchange="this.form.submit()">
                                 {% for status_value, status_label in order.STATUS_CHOICES %}
+ /
+
                                     <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
                                 {% endfor %}
                             </select>
@@ -60,6 +62,9 @@
                     </td>
                     <td data-label="Payment Method">{{ order.payment_method }}</td>
                     <td data-label="Date">{{ order.created_at|date:"Y-m-d" }}</td>
+                    <td data-label="Action">
+                        <!-- Add any additional actions here, e.g., delete or view details -->
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
